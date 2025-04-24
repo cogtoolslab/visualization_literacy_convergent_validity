@@ -203,18 +203,21 @@ anova(accuracy_baseline_math_exp_sample, accuracy_interaction_math_exp_sample, t
 
 # > FIGURE: Comparing performance across groups by math experience ----
 
+
+
 fig_math_exp = data %>%
   group_by(math_sum, recruitmentPlatform) %>%
   summarize(
     mean_accuracy = mean(accuracy),
-    se_accuracy = sd(accuracy) / sqrt(n())
+    ci_accuracy = (sd(accuracy) / sqrt(n())) * 1.96,
+    obs = n()
   ) %>%
   ggplot(aes(x = reorder(math_sum, mean_accuracy),
              y = mean_accuracy,
              fill = recruitmentPlatform,
              dist = 'norm',
              arg1 = mean_accuracy,
-             arg2 = se_accuracy )) +
+             arg2 = ci_accuracy )) +
   stat_dist_halfeye(show_interval = TRUE,
                     position = position_dodge(width = 0),
                     width = 0.95,
@@ -242,6 +245,8 @@ ggsave(paste(FIGURES_DIR, 'Proportion_MathExperience_BySample_RAW.pdf', sep = '/
        fig_math_exp,
        width = 6, height = 7,
        device = cairo_pdf)
+
+
 
 
 # ANALYSIS: Comparing performance across assessments ----
@@ -450,13 +455,14 @@ fig_graph_type = data %>%
   group_by(origStudy, graphType, study_graph, filename) %>%
   summarize(
     mean_accuracy = mean(accuracy),
-    se_accuracy = sd(accuracy) / sqrt(n())
+    ci_accuracy = (sd(accuracy) / sqrt(n())) * 1.96,
+    obs = n()
   ) %>%
   ggplot(aes(x = study_graph,
              y = mean_accuracy,
              dist = 'norm',
              arg1 = mean_accuracy,
-             arg2 = se_accuracy,
+             arg2 = ci_accuracy,
              fill = origStudy)
   ) +
   stat_dist_halfeye(
@@ -625,7 +631,8 @@ fig_question_type = data %>%
   group_by(origStudy, origStudy_taskCategorization) %>%
   summarize(
     mean_accuracy = mean(accuracy),
-    se_accuracy = sd(accuracy) / sqrt(n())
+    ci_accuracy = (sd(accuracy) / sqrt(n())) * 1.96,
+    obs = n()
   ) %>%
   mutate(
     question_type_fac = factor(
@@ -640,7 +647,7 @@ fig_question_type = data %>%
              y = mean_accuracy,
              dist = 'norm',
              arg1 = mean_accuracy,
-             arg2 = se_accuracy,
+             arg2 = ci_accuracy,
              fill = origStudy)
   ) +
   stat_dist_halfeye(
